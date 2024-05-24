@@ -68,13 +68,18 @@ for i in cat_dir:
     with open(i) as f:
         class_desc = f.readlines()
         class_desc = [i.replace("\n","").split(":") for i in class_desc ]
-        class_o = dict((value, key) for key, value in class_desc)
-        print(class_o)
-        class_overview[cat] = class_o
         queries = [i[1] for i in class_desc]
-        print(queries)
         text[cat] = open_clip.tokenize(queries)
 
+        # create mapping from query to classes, as some classes have multiple queries
+        classes = [i[0] for i in class_desc]
+        class_set = list( dict.fromkeys(classes) )
+        query_int = np.arange(0, len(queries), 1, dtype=int).tolist()
+        class_int = np.arange(0, len(class_set), 1, dtype=int).tolist()
+        class_dict = dict(zip(class_set, class_int))
+        class_int2 = [class_dict[i] for i in classes]
+        class_overview[cat] = dict(zip(query_int, class_int2))
+        
 
 # Load the images
 img_dir = "../../Images/ClimateCT"
@@ -94,43 +99,38 @@ for i in text.keys():
 
     # Access the label to int mapping
     label_to_idx, idx_to_label = dataset.get_label_mappings()
-    print(idx_to_label)
     acc_cw = {c:0 for c in label_to_idx.keys()}
 
-    # prepare the queries
-    query_dict = {k:[] for k in label_to_idx.keys()}
-    print(query_dict)
+    # prepare to map the queries to classes
+    query_class_mapping = class_overview[i]
     
-
     for images, labels in dataloader:
         label_stats = Counter(np.array(labels))
         label_stats = {idx_to_label[i]:v for i,v in label_stats.items()}
-        print(label_stats)
         # Training code here
         with torch.no_grad():
+            # embed image and text
             image_features = model.encode_image(images)
             text_features = model.encode_text(text[i])
+            # normalize embeddings
             image_features /= image_features.norm(dim=-1, keepdim=True)
             text_features /= text_features.norm(dim=-1, keepdim=True)
+            # map images to queries and find closest query
             text_probs = (100.0 * image_features @ text_features.T).softmax(dim=-1)
-            class_preds = torch.argmax(text_probs, dim=1)
+            query_preds = torch.argmax(text_probs, dim=1).tolist()
+            # map queries to classes
+            class_preds = [query_class_mapping[i] for i in query_preds]
+            class_preds = torch.tensor(class_preds)
             # map queries to classes (some classes contain multiple queries)
             pred_stats = Counter(np.array(class_preds))
-            class_preds_final = []
-            for l in range(len(text[i])):
-                q = text[i]
-                print(q)
-                class_preds_final  
             pred_stats = Counter(np.array(class_preds))
             pred_stats = {idx_to_label[i]:v for i,v in pred_stats.items()}
-            print(pred_stats)
             total += labels.size(0)
             correct += (class_preds == labels).sum().item()
 
             #for c in pred_stats.keys():
             #    acc_cw[c] += ((class_preds == labels) * (labels == class_int)).float().sum() / (max(labels == class_int).sum(), 1)
             
-    break
             
     #print("Label probs:", text_probs)  # prints: [[1., 0., 0.]]
     acc = correct / total
