@@ -13,6 +13,8 @@ import numpy as np
 
 # load model
 model, _, preprocess = open_clip.create_model_and_transforms('ViT-B-32-quickgelu', pretrained='laion400m_e32')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model.to(device)
 
 # create a custom dataset class which takes a folder of images and a text file of img file names and corresponding labels
 class CustomImageDataset(Dataset):
@@ -106,8 +108,8 @@ for i in text.keys():
         # Training code here
         with torch.no_grad():
             # embed image and text
-            image_features = model.encode_image(images)
-            text_features = model.encode_text(text[i])
+            image_features = model.encode_image(images.to(device))
+            text_features = model.encode_text(text[i].to(device))
             # normalize embeddings
             image_features /= image_features.norm(dim=-1, keepdim=True)
             text_features /= text_features.norm(dim=-1, keepdim=True)
