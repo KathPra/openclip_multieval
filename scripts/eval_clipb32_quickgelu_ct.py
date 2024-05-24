@@ -14,7 +14,7 @@ import numpy as np
 # load model
 model, _, preprocess = open_clip.create_model_and_transforms('ViT-B-32-quickgelu', pretrained='laion400m_e32')
 
-# Create custom dataset class
+# create a custom dataset class which takes a folder of images and a text file of img file names and corresponding labels
 class CustomImageDataset(Dataset):
     def __init__(self, txt_file, img_dir, transform=None):
         """
@@ -45,13 +45,9 @@ class CustomImageDataset(Dataset):
 
     def __getitem__(self, idx):
         img_name, label = self.img_labels[idx]
-        img_path = os.path.join(self.img_dir, img_name)
-        image = Image.open(img_path+".jpg")
-        # remove transparency of images that contain it
-        if image.mode == 'P' or (image.mode == 'RGBA' and image.info.get('transparency') is not None):
-            image = image.convert("RGBA")
-        else:
-            image = image.convert("RGB")
+        img_path = os.path.join(self.img_dir, img_name + ".jpg")
+        image = Image.open(img_path)
+        image = image.convert("RGBA" if image.mode in ['P', 'RGBA'] and image.info.get('transparency') is not None else "RGB")
         if self.transform:
             image = self.transform(image)
         return image, label
