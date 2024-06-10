@@ -1,0 +1,91 @@
+Accuracy for setting: 0.3353
+Class-wise Metrics for setting:
+  No setting: Accuracy=0.3316, Precision=0.2085, Recall=0.3316, F1 Score=0.2560, Support=193
+  Indoor space: Accuracy=0.2277, Precision=0.7286, Recall=0.2277, F1 Score=0.3469, Support=224
+  Residential/commercial: Accuracy=0.1197, Precision=0.8095, Recall=0.1197, F1 Score=0.2086, Support=142
+  Arctic, Antarctic: Accuracy=0.9722, Precision=0.2047, Recall=0.9722, F1 Score=0.3382, Support=36
+  Ocean, coastal: Accuracy=0.4868, Precision=0.5692, Recall=0.4868, F1 Score=0.5248, Support=76
+  Forest, jungle: Accuracy=0.2679, Precision=0.3261, Recall=0.2679, F1 Score=0.2941, Support=56
+  Other setting: Accuracy=0.0865, Precision=0.1250, Recall=0.0865, F1 Score=0.1023, Support=104
+  Industrial: Accuracy=0.6579, Precision=0.6944, Recall=0.6579, F1 Score=0.6757, Support=38
+  Agricultural/rural: Accuracy=0.7941, Precision=0.3253, Recall=0.7941, F1 Score=0.4615, Support=34
+  Other nature: Accuracy=0.3333, Precision=0.3023, Recall=0.3333, F1 Score=0.3171, Support=78
+  Outer space: Accuracy=0.7727, Precision=0.6538, Recall=0.7727, F1 Score=0.7083, Support=22
+  Desert: Accuracy=0.7143, Precision=0.4545, Recall=0.7143, F1 Score=0.5556, Support=35
+
+  Overall balanced accuracy (Macro): 0.4804
+  Overall Precision (Macro): 0.4502
+  Overall Recall (Macro): 0.4804
+  Overall F1 Score (Macro): 0.3991
+
+Accuracy for animals: 0.7909
+Class-wise Metrics for animals:
+  No animals: Accuracy=0.8488, Precision=0.9305, Recall=0.8488, F1 Score=0.8878, Support=820
+  Other animals: Accuracy=0.0000, Precision=0.0000, Recall=0.0000, F1 Score=0.0000, Support=5
+  Pets: Accuracy=0.5217, Precision=0.6316, Recall=0.5217, F1 Score=0.5714, Support=23
+  Insects: Accuracy=0.6364, Precision=0.5600, Recall=0.6364, F1 Score=0.5957, Support=22
+  Amphibian or Reptile: Accuracy=0.5312, Precision=0.4722, Recall=0.5312, F1 Score=0.5000, Support=32
+  Land mammal: Accuracy=0.2500, Precision=0.2500, Recall=0.2500, F1 Score=0.2500, Support=24
+  Polar bear: Accuracy=0.8519, Precision=0.4340, Recall=0.8519, F1 Score=0.5750, Support=27
+  Fish: Accuracy=0.7500, Precision=0.5556, Recall=0.7500, F1 Score=0.6383, Support=20
+  Birds: Accuracy=0.5455, Precision=0.8571, Recall=0.5455, F1 Score=0.6667, Support=22
+  Farm animals: Accuracy=0.5217, Precision=0.4800, Recall=0.5217, F1 Score=0.5000, Support=23
+  Sea mammal: Accuracy=0.7000, Precision=0.3415, Recall=0.7000, F1 Score=0.4590, Support=20
+
+  Overall balanced accuracy (Macro): 0.5597
+  Overall Precision (Macro): 0.5011
+  Overall Recall (Macro): 0.5597
+  Overall F1 Score (Macro): 0.5131
+
+Accuracy for climateaction: 0.2399
+Class-wise Metrics for climateaction:
+  Other: Accuracy=0.3411, Precision=0.2032, Recall=0.3411, F1 Score=0.2547, Support=258
+  Politics: Accuracy=0.4709, Precision=0.5127, Recall=0.4709, F1 Score=0.4909, Support=172
+  No climate action: Accuracy=0.0724, Precision=0.3396, Recall=0.0724, F1 Score=0.1194, Support=497
+  Protests: Accuracy=0.1385, Precision=0.2647, Recall=0.1385, F1 Score=0.1818, Support=65
+  Fossil energy: Accuracy=0.6522, Precision=0.0968, Recall=0.6522, F1 Score=0.1685, Support=23
+  Sustainable energy: Accuracy=0.8696, Precision=0.1316, Recall=0.8696, F1 Score=0.2286, Support=23
+
+  Overall balanced accuracy (Macro): 0.4241
+  Overall Precision (Macro): 0.2581
+  Overall Recall (Macro): 0.4241
+  Overall F1 Score (Macro): 0.2407
+
+Accuracy for consequences: 0.2938
+Class-wise Metrics for consequences:
+  No consequences: Accuracy=0.2604, Precision=0.7769, Recall=0.2604, F1 Score=0.3900, Support=722
+  Biodiversity loss: Accuracy=0.1333, Precision=0.0870, Recall=0.1333, F1 Score=0.1053, Support=30
+  Covid & general health: Accuracy=0.3182, Precision=0.0370, Recall=0.3182, F1 Score=0.0664, Support=22
+  Melting Ice: Accuracy=0.0476, Precision=0.3333, Recall=0.0476, F1 Score=0.0833, Support=21
+  Wildfires: Accuracy=0.6250, Precision=0.7692, Recall=0.6250, F1 Score=0.6897, Support=32
+  Rising temperature: Accuracy=0.5769, Precision=0.3750, Recall=0.5769, F1 Score=0.4545, Support=26
+  Other extreme weather events: Accuracy=0.2917, Precision=0.3333, Recall=0.2917, F1 Score=0.3111, Support=24
+  Drought: Accuracy=0.2500, Precision=0.1346, Recall=0.2500, F1 Score=0.1750, Support=28
+  Other consequences: Accuracy=0.2059, Precision=0.0593, Recall=0.2059, F1 Score=0.0921, Support=34
+  Floods: Accuracy=0.3182, Precision=0.5000, Recall=0.3182, F1 Score=0.3889, Support=22
+  Economic consequences: Accuracy=0.3478, Precision=0.1013, Recall=0.3478, F1 Score=0.1569, Support=23
+  Human rights: Accuracy=0.5312, Precision=0.1164, Recall=0.5312, F1 Score=0.1910, Support=32
+  Sea level rise: Accuracy=0.7727, Precision=0.2742, Recall=0.7727, F1 Score=0.4048, Support=22
+
+  Overall balanced accuracy (Macro): 0.3599
+  Overall Precision (Macro): 0.2998
+  Overall Recall (Macro): 0.3599
+  Overall F1 Score (Macro): 0.2699
+
+Accuracy for type: 0.5145
+Class-wise Metrics for type:
+  Screenshot: Accuracy=0.4562, Precision=0.3763, Recall=0.4562, F1 Score=0.4124, Support=160
+  Data Visualization: Accuracy=0.4237, Precision=0.5435, Recall=0.4237, F1 Score=0.4762, Support=59
+  Photo: Accuracy=0.5693, Precision=0.9277, Recall=0.5693, F1 Score=0.7056, Support=541
+  Collage: Accuracy=0.3387, Precision=0.7241, Recall=0.3387, F1 Score=0.4615, Support=62
+  Illustration: Accuracy=0.2500, Precision=0.4643, Recall=0.2500, F1 Score=0.3250, Support=52
+  Meme: Accuracy=0.6000, Precision=0.3125, Recall=0.6000, F1 Score=0.4110, Support=25
+  Posters/Event invitations: Accuracy=0.6344, Precision=0.2599, Recall=0.6344, F1 Score=0.3688, Support=93
+  Other: Accuracy=0.0909, Precision=0.0101, Recall=0.0909, F1 Score=0.0182, Support=11
+  Infographic: Accuracy=0.5429, Precision=0.5429, Recall=0.5429, F1 Score=0.5429, Support=35
+
+  Overall balanced accuracy (Macro): 0.4340
+  Overall Precision (Macro): 0.4624
+  Overall Recall (Macro): 0.4340
+  Overall F1 Score (Macro): 0.4135
+
