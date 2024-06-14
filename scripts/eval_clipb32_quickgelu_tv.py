@@ -29,13 +29,14 @@ class CustomImageDataset(Dataset):
             img_dir (string): Directory with all the images.
             transform (callable, optional): Optional transform to be applied on a sample.
         """
+        """
         self.img_labels = []
         self.label_to_idx = {}
         self.idx_to_label = {}
         label_counter = 0
 
         # Iterate throught dictionary
-        for image_name, label in labels.items():
+        for image_name, label in tqdm.tqdm(labels.items()):
             if label not in self.label_to_idx:
                 self.label_to_idx[label] = label_counter
                 self.idx_to_label[label_counter] = label
@@ -43,30 +44,75 @@ class CustomImageDataset(Dataset):
             image_path = self._find_image_path(img_dir, image_name)
             if image_path:
                 self.img_labels.append((image_path, self.label_to_idx[label]))
-                
+         """        
         self.img_dir = img_dir
         self.transform = transform
 
-    def _find_image_path(self, root_dir, image_name):
-        """
-        Recursively search for an image file in all subdirectories.
-        """
-        for dirpath, _, filenames in os.walk(root_dir):
-            if image_name in filenames:
-                return os.path.join(dirpath, image_name)
-        return None
+        # Load the dictionary from the .torch file
+        self.labels_dict = labels
+        self.label_to_idx, self.idx_to_label = self._create_label_mappings(self.labels_dict)
+        self.img_labels = self._create_image_label_pairs(self.labels_dict)
+
+    def _create_label_mappings(self, labels_dict):
+        label_to_idx = {}
+        idx_to_label = {}
+        label_counter = 0
+
+        for label in labels_dict.values():
+            if label not in label_to_idx:
+                label_to_idx[label] = label_counter
+                idx_to_label[label_counter] = label
+                label_counter += 1
+
+        return label_to_idx, idx_to_label
+
+    def _create_image_label_pairs(self, labels_dict):
+        img_labels = []
+        image_paths = self._find_all_image_paths(self.img_dir)
+
+        for image_name, label in labels_dict.items(): # correct here, e.g. id_1415643430462558209_2021-07-15.jpg K
+            if image_name in image_paths:
+                img_labels.append((image_paths[image_name], self.label_to_idx[label]))
+            else:
+                print(f"Warning: Image {image_name} not found in {self.img_dir}.")
+
+        return img_labels
+    
+    def _find_all_image_paths(self, root_dir):
+        image_paths = {}
+        for dirpath, _, filenames in os.walk(root_dir): # root_dir = ../../Images/
+            for filename in filenames:
+                image_paths[filename] = os.path.join(dirpath, filename)
+        return image_paths
 
     def __len__(self):
         return len(self.img_labels)
 
     def __getitem__(self, idx):
-        img_name, label = self.img_labels[idx]
+        img_path, label = self.img_labels[idx]
+        print(img_path,label)
+        try:
+            image = Image.open(img_path)
+
+            # Handle images with transparency
+            if image.mode in ('P', 'RGBA'):
+                image = image.convert("RGBA")
+            else:
+                image = image.convert("RGB")
+
+            if self.transform:
+                image = self.transform(image)
+            return image, label
+        except Exception as e:
+            raise ValueError(f"Error loading image {img_path}: {e}")
+
+        """
         img_path = os.path.join(self.img_dir, img_name + ".jpg")
         image = Image.open(img_path)
         image = image.convert("RGBA" if image.mode in ['P', 'RGBA'] and image.info.get('transparency') is not None else "RGB")
         if self.transform:
             image = self.transform(image)
-        return image, label
+        return image, label"""
 
     def get_label_mappings(self):
         return self.label_to_idx, self.idx_to_label
@@ -93,6 +139,7 @@ def evaluate_category(category, text, class_overview, img_dir, preprocess, top_k
     # remove the noisy class of mixed animals
     label_file = {key:value for (key, value) in label_file.items() if value not in ["Mixed animals"]}
     dataset = CustomImageDataset(labels=label_file, img_dir=img_dir, transform=preprocess)
+    print("dataset created")
     dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
     
     label_to_idx, idx_to_label = dataset.get_label_mappings()
