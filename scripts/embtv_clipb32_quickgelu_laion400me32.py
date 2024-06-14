@@ -16,7 +16,10 @@ import tqdm
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # load model
-model, _, preprocess = open_clip.create_model_and_transforms('ViT-B-32-quickgelu', pretrained='laion400m_e32') # quickgelu is used by openai
+model_name = "ViT-B-32-quickgelu"
+pretrain_dataset = "laion400m_e32"
+
+model, _, preprocess = open_clip.create_model_and_transforms(model_name, pretrained=pretrain_dataset) # quickgelu is used by openai
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 model.eval()  # model in train mode by default, impacts some models with BatchNorm or stochastic depth active
@@ -38,7 +41,7 @@ def compute_embeddings(img_dir, labels_dict, model, transform,output_file):
         image = transform(image).unsqueeze(0)  # Add batch dimension
 
         with torch.no_grad():
-            embedding = model(image).squeeze().numpy()  # Remove batch dimension and convert to numpy
+            embedding = model.encode_image(image.to(device)).squeeze()#.numpy()  # Remove batch dimension and convert to numpy
 
         embeddings[image_name] = embedding
     
@@ -54,7 +57,7 @@ def find_all_image_paths(root_dir, img_list):
         return image_paths
 
 
-output_file = "../embeddings/tv_clipb32_quickgelu_laion400me32.torch"
+output_file = f"../embeddings/tv_{model_name}_{pretrain_dataset}.torch"
 labels_dict = torch.load(f"../../Labels/llama3/animals_llama3_final.torch")
 label_list = list(labels_dict.keys())
 img_dir = "../../Images/ClimateTV/"
