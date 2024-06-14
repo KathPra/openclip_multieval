@@ -2,7 +2,7 @@
 
 # load packages
 import torch
-from PIL import Image
+from PIL import Image, ImageFile
 import os
 #from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, Dataset
@@ -12,6 +12,9 @@ import numpy as np
 import open_clip
 import matplotlib.pyplot as plt
 import tqdm
+
+# allow to load images that exceed max size
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # load model
 model, _, preprocess = open_clip.create_model_and_transforms('ViT-B-32-quickgelu', pretrained='laion400m_e32') # quickgelu is used by openai
@@ -90,7 +93,6 @@ class CustomImageDataset(Dataset):
 
     def __getitem__(self, idx):
         img_path, label = self.img_labels[idx]
-        print(img_path,label)
         try:
             image = Image.open(img_path)
 
@@ -135,7 +137,7 @@ def process_text_descriptions(cat_dir):
 def evaluate_category(category, text, class_overview, img_dir, preprocess, top_k):
     # load annotations
     print(category)
-    label_file = torch.load(f"../../Labels/llama3/{category}_llama3_clean.torch")
+    label_file = torch.load(f"../../Labels/llama3/{category}_llama3_final.torch")
     # remove the noisy class of mixed animals
     label_file = {key:value for (key, value) in label_file.items() if value not in ["Mixed animals"]}
     dataset = CustomImageDataset(labels=label_file, img_dir=img_dir, transform=preprocess)
@@ -235,7 +237,7 @@ def save_convmat(conv_mat, topic, label_overview):
 #cat_dir = glob.glob("../../ClimateVisions_Dataset/categories/*.txt")
 cat_dir = glob.glob("../../ClimateVisions_Dataset/categories/*animals.txt")
 text, class_overview = process_text_descriptions(cat_dir)
-img_dir = "../../Images/"
+img_dir = "../../Images/ClimateTV/"
 
 for category in text.keys():
     class_metrics, overall_metrics  = evaluate_category(category, text, class_overview, img_dir, preprocess, top_k=3)
