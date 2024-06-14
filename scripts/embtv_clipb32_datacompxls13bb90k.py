@@ -31,12 +31,11 @@ def compute_embeddings(img_dir, labels_dict, model, transform,output_file):
     for image_name in tqdm.tqdm(labels_dict.keys()):
         image_path = img_dir[image_name]
 
-        image = Image.open(image_path).convert('RGB')
+        image = Image.open(image_path)
+
         # Handle images with transparency
-        if image.mode in ('P', 'RGBA'):
-            image = image.convert("RGBA")
-        else:
-            image = image.convert("RGB")
+        if image.mode in ('P', 'RGBA'): image = image.convert("RGBA")
+        else: image = image.convert("RGB")
 
         image = transform(image).unsqueeze(0)  # Add batch dimension
 

@@ -4,12 +4,7 @@
 import torch
 from PIL import Image, ImageFile
 import os
-#from torchvision import datasets, transforms
-from torch.utils.data import DataLoader, Dataset
-import glob
-import numpy as np
 import open_clip
-import matplotlib.pyplot as plt
 import tqdm
 
 # allow to load images that exceed max size
@@ -23,21 +18,18 @@ model, _, preprocess = open_clip.create_model_and_transforms(model_name, pretrai
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 model.eval()  # model in train mode by default, impacts some models with BatchNorm or stochastic depth active
-tokenizer = open_clip.get_tokenizer('ViT-B-32')
 
 # Function to compute and save embeddings
 def compute_embeddings(img_dir, labels_dict, model, transform,output_file):
     embeddings = {}
     for image_name in tqdm.tqdm(labels_dict.keys()):
         image_path = img_dir[image_name]
+        image = Image.open(image_path)
 
-        image = Image.open(image_path).convert('RGB')
         # Handle images with transparency
-        if image.mode in ('P', 'RGBA'):
-            image = image.convert("RGBA")
-        else:
-            image = image.convert("RGB")
-
+        if image.mode in ('P', 'RGBA'): image = image.convert("RGBA")
+        else: image = image.convert("RGB")
+        
         image = transform(image).unsqueeze(0)  # Add batch dimension
 
         with torch.no_grad():
