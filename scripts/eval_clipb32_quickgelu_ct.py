@@ -7,7 +7,7 @@ import os
 #from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, Dataset
 import glob
-from sklearn.metrics import accuracy_score, balanced_accuracy_score, confusion_matrix, ConfusionMatrixDisplay, precision_recall_fscore_support
+from sklearn.metrics import accuracy_score, balanced_accuracy_score, confusion_matrix, ConfusionMatrixDisplay, precision_recall_fscore_support, top_k_accuracy_score
 import numpy as np
 import open_clip
 import matplotlib.pyplot as plt
@@ -91,7 +91,7 @@ def evaluate_category(category, text, class_overview, img_dir, preprocess, top_k
     # required for recall, precision and F1
     true_labels = []
     predicted_labels = []
-    predicted_labels_top_k = []
+    all_predicted_labels = []
     
     with torch.no_grad():
         for images, labels in dataloader:
@@ -105,7 +105,7 @@ def evaluate_category(category, text, class_overview, img_dir, preprocess, top_k
             
             text_probs = (100.0 * image_features @ text_features.T).softmax(dim=-1)
             _, top_k_preds = torch.topk(text_probs, top_k, dim=1)
-            class_preds_top_k = torch.tensor([[query_class_mapping[q.item()] for q in top_k_pred] for top_k_pred in top_k_preds]).to(device)
+            all_class_preds = torch.tensor([[query_class_mapping[q.item()] for q in top_k_pred] for top_k_pred in top_k_preds]).to(device)
             
             query_preds = torch.argmax(text_probs, dim=1).tolist()
             class_preds = torch.tensor([query_class_mapping[q] for q in query_preds]).to(device)
@@ -113,11 +113,14 @@ def evaluate_category(category, text, class_overview, img_dir, preprocess, top_k
             # other metrics
             true_labels.extend(labels.cpu().numpy())
             predicted_labels.extend(class_preds.cpu().numpy())
-            predicted_labels_top_k.extend(class_preds_top_k.cpu().numpy())
+            all_predicted_labels.extend(text_probs.cpu().numpy())
     
     
     overall_metrics = compute_overall_metrics(true_labels, predicted_labels, category)
     class_metrics = compute_classwise_metrics(true_labels, predicted_labels, idx_to_label, category)
+
+    #overall_metrics["top_2_acc"] = top_k_accuracy_score(true_labels, all_predicted_labels, k=2, labels=list(idx_to_label.keys()))
+    #overall_metrics["top_3_acc"] =  top_k_accuracy_score(true_labels, all_predicted_labels, k=3, labels=list(idx_to_label.keys()))
 
     return class_metrics, overall_metrics
 
@@ -176,15 +179,15 @@ for category in text.keys():
     class_metrics, overall_metrics  = evaluate_category(category, text, class_overview, img_dir, preprocess, top_k=3)
     #overall_top_k_accuracy.append(overall_metrics['Top-k Accuracy'])
     
-    print(f"Class-wise Metrics for {category}:")
-    for class_name, metrics in class_metrics.items():
-        print(f"  {class_name}: Accuracy={metrics['Accuracy']:.4f}, Precision={metrics['Precision']:.4f}, Recall={metrics['Recall']:.4f}, F1 Score={metrics['F1 Score']:.4f}, Support={metrics['Support']}")
-    print()
+    #print(f"  Overall Top-2 acc: {overall_metrics['top_2_acc']:.4f}")
+    #print(f"  Overall Top-3 acc: {overall_metrics['top_3_acc']:.4f}")
     print(f"  Overall balanced accuracy (Macro): {overall_metrics['Balanced Accuracy']:.4f}")
     print(f"  Overall Precision (Macro): {overall_metrics['Precision (Macro)']:.4f}")
     print(f"  Overall Recall (Macro): {overall_metrics['Recall (Macro)']:.4f}")
     print(f"  Overall F1 Score (Macro): {overall_metrics['F1 Score (Macro)']:.4f}")
-    #print(f"  Top-3 Accuracy: {overall_metrics['Top-k Accuracy']:.4f}")
+    print()
+    for class_name, metrics in class_metrics.items():
+        print(f"  {class_name}: Accuracy={metrics['Accuracy']:.4f}, Precision={metrics['Precision']:.4f}, Recall={metrics['Recall']:.4f}, F1 Score={metrics['F1 Score']:.4f}, Support={metrics['Support']}")
     print()
 
 #average_top_k_accuracy = sum(overall_top_k_accuracy) / len(overall_top_k_accuracy)
