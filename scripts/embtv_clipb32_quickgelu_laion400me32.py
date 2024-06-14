@@ -36,6 +36,7 @@ def compute_embeddings(img_dir, labels_dict, model, transform,output_file):
             embedding = model.encode_image(image.to(device)).squeeze()#.numpy()  # Remove batch dimension and convert to numpy
 
         embeddings[image_name] = embedding
+        break
     
     torch.save(embeddings, output_file)
 
@@ -49,7 +50,7 @@ def find_all_image_paths(root_dir, img_list):
         return image_paths
 
 
-output_file = f"../embeddings/tv_{model_name}_{pretrain_dataset}.torch"
+output_file = f"embeddings/tv_{model_name}_{pretrain_dataset}.torch"
 labels_dict = torch.load(f"../../Labels/llama3/animals_llama3_final.torch")
 label_list = list(labels_dict.keys())
 img_dir = "../../Images/ClimateTV/"

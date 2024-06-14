@@ -55,7 +55,7 @@ def find_all_image_paths(root_dir, img_list):
         return image_paths
 
 
-output_file = f"../embeddings/tv_{model_name}_{pretrain_dataset}.torch"
+output_file = f"embeddings/tv_{model_name}_{pretrain_dataset}.torch"
 labels_dict = torch.load(f"../../Labels/llama3/animals_llama3_final.torch")
 label_list = list(labels_dict.keys())
 img_dir = "../../Images/ClimateTV/"

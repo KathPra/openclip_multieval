@@ -4,12 +4,7 @@
 import torch
 from PIL import Image, ImageFile
 import os
-#from torchvision import datasets, transforms
-from torch.utils.data import DataLoader, Dataset
-import glob
-import numpy as np
 import open_clip
-import matplotlib.pyplot as plt
 import tqdm
 
 # allow to load images that exceed max size
@@ -17,20 +12,19 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # load model
 model_name = "ViT-B-32"
-pretrain_dataset = "openai"
+pretrain_dataset = "commonpool_m_clip_s128m_b4k"
 
 model, _, preprocess = open_clip.create_model_and_transforms(model_name, pretrained=pretrain_dataset) # quickgelu is used by openai
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
 model.eval()  # model in train mode by default, impacts some models with BatchNorm or stochastic depth active
-tokenizer = open_clip.get_tokenizer('ViT-B-32')
+
 
 # Function to compute and save embeddings
 def compute_embeddings(img_dir, labels_dict, model, transform,output_file):
     embeddings = {}
     for image_name in tqdm.tqdm(labels_dict.keys()):
         image_path = img_dir[image_name]
-
         image = Image.open(image_path)
 
         # Handle images with transparency
