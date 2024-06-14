@@ -7,7 +7,6 @@ import os
 #from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, Dataset
 import glob
-from collections import Counter
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, confusion_matrix, ConfusionMatrixDisplay, precision_recall_fscore_support
 import numpy as np
 import clip
@@ -84,14 +83,9 @@ def evaluate_category(category, text, class_overview, img_dir, preprocess, top_k
     label_to_idx, idx_to_label = dataset.get_label_mappings()
     query_class_overview = class_overview[category]
 
-    class_list = list(dict.fromkeys(idx_to_label))
     # create mapping two combine results for classes with multiple queries
     query_class_map = dict(zip(np.arange(0,len(query_class_overview),1),query_class_overview.values()))
     query_class_mapping = {k:label_to_idx[v] for (k,v) in query_class_map.items()}
-
-    # required for class_wise accuracy
-    total_per_class = Counter()
-    correct_per_class = Counter()
 
     # required for recall, precision and F1
     true_labels = []
@@ -119,23 +113,11 @@ def evaluate_category(category, text, class_overview, img_dir, preprocess, top_k
             true_labels.extend(labels.cpu().numpy())
             predicted_labels.extend(class_preds.cpu().numpy())
             predicted_labels_top_k.extend(class_preds_top_k.cpu().numpy())
-
-            # class-wise accuracy
-            for label, pred in zip(labels, class_preds):
-                total_per_class[idx_to_label[label.item()]] += 1
-                if label == pred:
-                    correct_per_class[idx_to_label[label.item()]] += 1
     
     
     overall_metrics = compute_overall_metrics(true_labels, predicted_labels, category)
-
-    # class-wise metrics
-    class_wise_accuracy = {class_name: correct_per_class[class_name] / total_per_class[class_name] 
-                           for class_name in total_per_class}
-    print(class_wise_accuracy)
     class_metrics = compute_classwise_metrics(true_labels, predicted_labels, idx_to_label, category)
 
-    
     return class_metrics, overall_metrics
 
 def compute_overall_metrics(true_labels, pred_labels, cat):
@@ -157,7 +139,6 @@ def compute_overall_metrics(true_labels, pred_labels, cat):
 
 def compute_classwise_metrics(true_labels, pred_labels, mapping, topic):
     prec, recall, f1, support = precision_recall_fscore_support(true_labels, pred_labels, average=None)
-    print(mapping)
 
     # compuate and save confusion matrix
     conf_matrix = confusion_matrix(true_labels, pred_labels, labels=list(mapping.keys()), normalize="true")
@@ -204,7 +185,6 @@ for category in text.keys():
     print(f"  Overall F1 Score (Macro): {overall_metrics['F1 Score (Macro)']:.4f}")
     #print(f"  Top-3 Accuracy: {overall_metrics['Top-k Accuracy']:.4f}")
     print()
-    break
 
 #average_top_k_accuracy = sum(overall_top_k_accuracy) / len(overall_top_k_accuracy)
 #print("Average Top-k Accuracy across all categories:", average_top_k_accuracy)
